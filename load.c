@@ -1,21 +1,20 @@
 #include "load.h"
 #include "fun.h"
 #include <stdio.h>
-#include <windows.h>
+#include <dlfcn.h>
 void LoadRun(const char * const s) {
 void * lib;
 void (*fun)(void);
-lib = LoadLibrary(s); //загрузка библиотеки в память
+lib = dlopen(s, RTLD_LAZY); 
 if (!lib) {
 printf("cannot open library '%s'\n", s);
 return;
 }
-fun = (void (*)(void))GetProcAddress((HINSTANCE)lib, "func") ;
-//получение указателя на функцию из библиотеки
+fun = (void (*)(void))dlsym(lib, "run") ;
 if (fun == NULL) {
 printf("cannot load function func\n");
 } else {
 fun();
 }
-FreeLibrary((HINSTANCE)lib); //выгрузка библиотеки
+dlclose(lib);
 }
